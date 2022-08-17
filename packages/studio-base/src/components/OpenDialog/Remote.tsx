@@ -3,7 +3,6 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/
 
 import { Typography, TextField } from "@mui/material";
-import path from "path";
 import { useCallback, useState, useMemo } from "react";
 
 import Stack from "@foxglove/studio-base/components/Stack";
@@ -20,14 +19,6 @@ type RemoteProps = {
   availableSources: IDataSourceFactory[];
 };
 
-function maybeParseURL(urlString: string): undefined | URL {
-  try {
-    return new URL(urlString);
-  } catch {
-    return undefined;
-  }
-}
-
 export default function Remote(props: RemoteProps): JSX.Element {
   const { onCancel, onBack, availableSources } = props;
 
@@ -40,24 +31,13 @@ export default function Remote(props: RemoteProps): JSX.Element {
       return;
     }
 
-    const parsedUrl = maybeParseURL(currentUrl);
-    if (!parsedUrl) {
-      setErrorMessage(`${currentUrl} is not a valid URL`);
-      return;
-    }
-
-    const extension = path.extname(parsedUrl.pathname);
-    if (extension.length === 0) {
-      setErrorMessage("URL must end with a filename and extension");
-      return;
-    }
-
     // find remote supporting this extension
     const foundSource = availableSources.find((source) => {
-      return source.type === "remote-file" && source.supportedFileTypes?.includes(extension);
+      return source.type === "remote-file";
     });
+
     if (!foundSource) {
-      setErrorMessage(`No remote data sources available for ${extension} files`);
+      setErrorMessage(`No remote data sources available for files`);
       return;
     }
 
